@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     }
 
     // 设置登录 cookie
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     cookieStore.set('admin_session', crypto.randomUUID(), {
       maxAge: 60 * 60 * 24, // 1天
       httpOnly: true,

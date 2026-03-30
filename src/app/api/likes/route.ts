@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const { messageId } = body
     
     // 从 cookie 获取 fingerprint
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     let fingerprint = cookieStore.get('bw_fp')?.value
     
     if (!fingerprint) {
