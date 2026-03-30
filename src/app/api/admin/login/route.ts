@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 import crypto from 'crypto'
 
-// 管理员登录
+// 管理员登录（简化版，用 header 代替 cookie）
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -27,15 +26,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '用户名或密码错误' }, { status: 401 })
     }
 
-    // 设置登录 cookie
-    const cookieStore = await cookies()
-    cookieStore.set('admin_session', crypto.randomUUID(), {
-      maxAge: 60 * 60 * 24, // 1天
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production'
-    })
-
-    return NextResponse.json({ success: true })
+    // 返回 token（简化版，不用 cookie）
+    const token = crypto.randomUUID()
+    
+    return NextResponse.json({ success: true, token })
   } catch (_error) {
     return NextResponse.json({ error: '登录失败' }, { status: 500 })
   }

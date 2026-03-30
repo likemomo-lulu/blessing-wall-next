@@ -1,21 +1,14 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { cookies } from 'next/headers'
 
-// 点赞/取消点赞
+// 点赞/取消点赞（简化版，用 header 代替 cookie）
 export async function POST(request: Request) {
   try {
     const body = await request.json()
     const { messageId } = body
     
-    // 从 cookie 获取 fingerprint
-    const cookieStore = await cookies()
-    let fingerprint = cookieStore.get('bw_fp')?.value
-    
-    if (!fingerprint) {
-      fingerprint = Math.random().toString(36).substring(2, 15)
-      cookieStore.set('bw_fp', fingerprint, { maxAge: 60 * 60 * 24 * 365 })
-    }
+    // 从 header 获取 fingerprint
+    const fingerprint = request.headers.get('x-fingerprint') || Math.random().toString(36).substring(2, 15)
 
     // 检查是否已点赞
     const existingLike = await prisma.like.findUnique({
