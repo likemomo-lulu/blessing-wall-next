@@ -1,7 +1,8 @@
 import Link from 'next/link'
 
 async function getWalls(): Promise<Array<{id: string; title: string; description: string; slug: string; status: string; themeColor: string; messageCount: number; likeCount: number; createdAt: string}>> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/walls`, {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+  const res = await fetch(`${baseUrl}/api/walls`, {
     cache: 'no-store'
   })
   if (!res.ok) return []
