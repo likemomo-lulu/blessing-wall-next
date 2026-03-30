@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { mockMessages, isMock } from '@/lib/mock'
 
+export const dynamic = 'force-dynamic'
+
 // 获取墙的留言
 export async function GET(request: Request) {
   try {

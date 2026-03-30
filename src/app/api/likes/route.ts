@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 // 点赞/取消点赞（简化版，用 header 代替 cookie）
 export async function POST(request: Request) {
   try {

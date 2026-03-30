@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import crypto from 'crypto'
 
+export const dynamic = 'force-dynamic'
+
 // 管理员登录（简化版，用 header 代替 cookie）
 export async function POST(request: Request) {
   try {

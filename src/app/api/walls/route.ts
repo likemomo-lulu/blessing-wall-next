@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { mockWalls, isMock } from '@/lib/mock'
 
+export const dynamic = 'force-dynamic'
+
 // 获取公开墙列表
 export async function GET() {
   try {
