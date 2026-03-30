@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { mockMessages, isMock } from '@/lib/mock'
 
 // 获取墙的留言
 export async function GET(request: Request) {
@@ -9,6 +10,11 @@ export async function GET(request: Request) {
     
     if (!wallId) {
       return NextResponse.json({ error: '缺少墙ID' }, { status: 400 })
+    }
+
+    if (isMock()) {
+      const messages = mockMessages.filter(m => m.wallId === wallId)
+      return NextResponse.json(messages)
     }
 
     const messages = await prisma.message.findMany({

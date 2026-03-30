@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { mockWalls, isMock } from '@/lib/mock'
 
 // 获取公开墙列表
 export async function GET() {
   try {
+    if (isMock()) {
+      return NextResponse.json(mockWalls)
+    }
+    
     const walls = await prisma.wall.findMany({
       where: {
         status: {
