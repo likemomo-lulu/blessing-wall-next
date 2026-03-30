@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Wall {
+  id            String    @id @default(cuid())
+  title         String
+  description   String
+  protagonist   String?
+  themeColor    String    @default("#FF6B6B")
+  slug          String    @unique
+  status        String    @default("open")
+  likeCount     Int       @default(0)
+  messageCount  Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  messages      Message[]
+}
+
+model Message {
+  id          String   @id @default(cuid())
+  wallId      String
+  wall        Wall     @relation(fields: [wallId], references: [id], onDelete: Cascade)
+  nickname    String   @default("匿名")
+  content     String   @db.Text
+  likeCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  likes       Like[]
+}
+
+model Like {
+  id            String   @id @default(cuid())
+  messageId     String
+  message       Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  fingerprint   String
+  createdAt     DateTime @default(now())
+
+  @@unique([messageId, fingerprint])
+  @@index([fingerprint])
+}
