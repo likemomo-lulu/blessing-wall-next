@@ -24,7 +24,7 @@ export default function LoginPage() {
 
       if (res.ok) {
         const data = await res.json()
-        sessionStorage.setItem('admin_token', data.token)
+        localStorage.setItem('admin_token', data.token)
         router.push('/admin')
       } else {
         const data = await res.json()

@@ -50,7 +50,7 @@ export default function AdminPage() {
   const [form, setForm] = useState({ title: '', description: '', protagonist: '', themeColor: '#f49442', slug: '' })
 
   useEffect(() => {
-    const t = sessionStorage.getItem('admin_token')
+    const t = localStorage.getItem('admin_token')
     if (t) {
       setToken(t)
       fetchWalls(t)
@@ -64,7 +64,7 @@ export default function AdminPage() {
       headers: t ? { Authorization: `Bearer ${t}` } : {},
     })
     if (res.status === 401) {
-      sessionStorage.removeItem('admin_token')
+      localStorage.removeItem('admin_token')
       window.location.href = '/login'
       return
     }
@@ -79,7 +79,7 @@ export default function AdminPage() {
   async function authHeaders(): Promise<HeadersInit> {
     // Ensure we have the token
     if (!token) {
-      const t = sessionStorage.getItem('admin_token')
+      const t = localStorage.getItem('admin_token')
       if (t) setToken(t)
       return t ? { Authorization: `Bearer ${t}` } : {}
     }
@@ -166,7 +166,7 @@ export default function AdminPage() {
     }
   }
 
-  if (!token && typeof window !== 'undefined' && !sessionStorage.getItem('admin_token')) {
+  if (!token && typeof window !== 'undefined' && !localStorage.getItem('admin_token')) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -197,7 +197,7 @@ export default function AdminPage() {
               <i className="fa-solid fa-plus mr-2" />创建新墙
             </button>
             <button
-              onClick={() => { sessionStorage.removeItem('admin_token'); window.location.href = '/login' }}
+              onClick={() => { localStorage.removeItem('admin_token'); window.location.href = '/login' }}
               className="px-4 py-2.5 rounded-xl border border-black/[0.12] text-stone-600 cursor-pointer"
               style={{ background: 'transparent' }}
             >
