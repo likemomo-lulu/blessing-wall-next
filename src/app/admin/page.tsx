@@ -189,6 +189,9 @@ export default function AdminPage() {
             <p className="text-sm mt-1" style={{ color: '#9a8a7a' }}>管理你的所有祝福墙</p>
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/" className="px-4 py-2.5 rounded-xl font-medium border cursor-pointer" style={{ borderColor: '#e8ddd0', color: '#6b5a4a' }}>
+              <i className="fa-solid fa-home mr-1.5"></i>首页
+            </Link>
             <button
               onClick={() => setShowCreate(true)}
               className="px-5 py-2.5 rounded-xl text-white font-medium border-none cursor-pointer"
