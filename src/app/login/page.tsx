@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
@@ -9,6 +9,11 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    const t = localStorage.getItem('admin_token')
+    if (t) router.push('/admin')
+  }, [router])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
