@@ -25,9 +25,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: '用户名或密码错误' }, { status: 401 })
     }
 
-    // 生成 token 并写入环境（运行时生效）
-    const token = crypto.randomUUID()
-    process.env.ADMIN_TOKEN = token
+    // 基于密码哈希生成固定 token，无需存储状态
+    const token = crypto.createHash('sha256').update(`${adminPasswordHash}:session`).digest('hex')
 
     return NextResponse.json({ success: true, token })
   } catch (error) {
