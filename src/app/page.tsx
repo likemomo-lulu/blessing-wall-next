@@ -1,12 +1,27 @@
 import Link from 'next/link'
+import { PrismaClient } from '@prisma/client'
 
-async function getWalls(): Promise<Array<{id: string; title: string; description: string; slug: string; status: string; themeColor: string; messageCount: number; likeCount: number; createdAt: string}>> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-  const res = await fetch(`${baseUrl}/api/walls`, {
-    cache: 'no-store'
-  })
-  if (!res.ok) return []
-  return res.json()
+const prisma = new PrismaClient()
+
+async function getWalls() {
+  try {
+    return await prisma.wall.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        slug: true,
+        status: true,
+        themeColor: true,
+        messageCount: true,
+        likeCount: true,
+        createdAt: true,
+      },
+    })
+  } catch {
+    return []
+  }
 }
 
 export default async function HomePage() {
