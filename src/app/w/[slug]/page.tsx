@@ -133,8 +133,11 @@ export default function WallPage() {
       },
       body: JSON.stringify({ messageId })
     })
-    if (res.ok && wall) {
-      await fetchMessages(wall.id)
+    if (res.ok) {
+      const { liked, likeCount } = await res.json()
+      setMessages(prev => prev.map(msg =>
+        msg.id === messageId ? { ...msg, likeCount, liked } : msg
+      ))
     }
   }
 
@@ -211,7 +214,7 @@ export default function WallPage() {
                     className="flex items-center gap-1.5 text-xs transition-transform active:scale-125"
                     style={{ background: 'none', border: 'none', color: '#bba', cursor: 'pointer' }}
                   >
-                    <i className="fa-regular fa-heart" />
+                    <i className={msg.liked ? 'fa-solid fa-heart' : 'fa-regular fa-heart'} style={msg.liked ? { color: '#e8456b' } : undefined} />
                     <span>{msg.likeCount}</span>
                   </button>
                   <button
@@ -291,14 +294,10 @@ export default function WallPage() {
 
 /** 下载模板弹窗 */
 const TEMPLATES = [
-  { name: '星空许愿', desc: '深蓝星空 · 浪漫', bg: '#0f0c29', emoji: '🌙' },
-  { name: '月夜情书', desc: '米色纸张 · 手绘', bg: '#f5f0e6', emoji: '🌙✨' },
-  { name: '温馨信纸', desc: '横线信纸 · 温暖', bg: '#fffef8', emoji: '💌' },
-  { name: '生日派对', desc: '彩色缤纷 · 欢乐', bg: '#fff0f5', emoji: '🎂' },
+  { name: '温馨花卉', desc: '横线信纸 · 温暖', bg: '#fffef8', emoji: '💌' },
   { name: '极简文艺', desc: '简约黑白 · 高级', bg: '#f8f8f8', emoji: '🌿' },
-  { name: '丝带信笺', desc: '蕾丝缎带 · 优雅', bg: '#fef6f0', emoji: '🎀' },
-  { name: '童趣可爱', desc: '手绘涂鸦 · 可爱', bg: '#f0f8ff', emoji: '🌈' },
-  { name: '复古生日', desc: '复古色调 · 怀旧', bg: '#f5efe8', emoji: '🎈' },
+  { name: '星空许愿', desc: '深蓝星空 · 浪漫', bg: '#0f0c29', emoji: '🌙' },
+  { name: '月夜祝愿', desc: '米色纸张 · 手绘', bg: '#f5f0e6', emoji: '🌙✨' },
 ]
 
 function DownloadModal({ message, initialIdx, wall, onClose }: {
@@ -360,78 +359,7 @@ function DownloadModal({ message, initialIdx, wall, onClose }: {
     }
 
     if (templateIdx === 0) {
-      // 星空许愿
-      const grad = ctx.createLinearGradient(0, 0, W * 0.3, H)
-      grad.addColorStop(0, '#0f0c29')
-      grad.addColorStop(0.5, '#1a1a4e')
-      grad.addColorStop(1, '#24243e')
-      ctx.fillStyle = grad
-      ctx.fillRect(0, 0, W, H)
-
-      // Stars
-      const rng = (seed: number) => { let s = seed; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280 } }
-      const rand = rng(42)
-      for (let i = 0; i < 80; i++) {
-        ctx.fillStyle = `rgba(255,255,255,${rand() * 0.6 + 0.2})`
-        ctx.beginPath()
-        ctx.arc(rand() * W, rand() * H, rand() * 2.5 + 0.3, 0, Math.PI * 2)
-        ctx.fill()
-      }
-
-      const glow = ctx.createRadialGradient(W / 2, 200, 0, W / 2, 200, 300)
-      glow.addColorStop(0, color + '30')
-      glow.addColorStop(1, 'transparent')
-      ctx.fillStyle = glow
-      ctx.fillRect(0, 0, W, H)
-
-      ctx.fillStyle = '#fff'
-      ctx.globalAlpha = 0.6
-      ctx.font = '13px "Noto Sans SC", sans-serif'
-      ctx.textAlign = 'center'
-      ctx.fillText('✦  致  ✦', W / 2, 200)
-      ctx.globalAlpha = 1
-      ctx.font = 'bold 30px "Noto Serif SC", serif'
-      ctx.fillText(recipient, W / 2, 245)
-
-      ctx.fillStyle = 'rgba(255,255,255,0.88)'
-      wrapText(content, W / 2, 340, 520, contentLineHeight, contentFont + 'px "Noto Serif SC", serif')
-
-      ctx.textAlign = 'right'
-      ctx.fillStyle = 'rgba(255,255,255,0.5)'
-      ctx.font = '33px "Noto Sans SC", sans-serif'
-      ctx.fillText(sender, W - 80, H - 120)
-      ctx.fillStyle = 'rgba(255,255,255,0.35)'
-      ctx.font = '24px "Noto Sans SC", sans-serif'
-      ctx.fillText(time, W - 80, H - 85)
-    } else if (templateIdx === 1) {
-      // 月夜情书
-      ctx.fillStyle = '#f5f0e6'
-      ctx.fillRect(0, 0, W, H)
-
-      ctx.strokeStyle = '#4a4a4a'
-      ctx.lineWidth = 1.5
-      ctx.beginPath()
-      ctx.arc(680, 130, 40, -Math.PI * 0.6, Math.PI * 0.6, false)
-      ctx.arc(660, 130, 32, Math.PI * 0.5, -Math.PI * 0.5, true)
-      ctx.closePath()
-      ctx.stroke()
-
-      ctx.fillStyle = '#6b5a4a'
-      ctx.textAlign = 'center'
-      ctx.font = 'bold 26px "Noto Serif SC", serif'
-      ctx.fillText('致 ' + recipient, W / 2, 280)
-
-      wrapText(content, W / 2, 340, 520, contentLineHeight, contentFont + 'px "Noto Serif SC", serif')
-
-      ctx.textAlign = 'right'
-      ctx.fillStyle = '#8a7a6a'
-      ctx.font = '33px "Noto Sans SC", sans-serif'
-      ctx.fillText(sender, W - 80, H - 120)
-      ctx.fillStyle = '#a89a8a'
-      ctx.font = '24px "Noto Sans SC", sans-serif'
-      ctx.fillText(time, W - 80, H - 85)
-    } else if (templateIdx === 2) {
-      // 温馨信纸
+      // 温馨花卉
       ctx.fillStyle = '#fffef8'
       ctx.fillRect(0, 0, W, H)
 
@@ -472,51 +400,11 @@ function DownloadModal({ message, initialIdx, wall, onClose }: {
       ctx.fillStyle = '#a89a8a'
       ctx.font = '24px "Noto Sans SC", sans-serif'
       ctx.fillText(time, W - 80, H - 85)
-    } else if (templateIdx === 3) {
-      // 生日派对
-      const grad = ctx.createLinearGradient(0, 0, W, H)
-      grad.addColorStop(0, '#fff0f5')
-      grad.addColorStop(1, '#f0f0ff')
-      ctx.fillStyle = grad
-      ctx.fillRect(0, 0, W, H)
-
-      // Confetti circles
-      const colors = ['#ff6b9d', '#ffd93d', '#6bcb77', '#4d96ff', '#ff6b6b', '#c084fc']
-      const rng = (seed: number) => { let s = seed; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280 } }
-      const rand = rng(99)
-      for (let i = 0; i < 30; i++) {
-        ctx.fillStyle = colors[Math.floor(rand() * colors.length)]
-        ctx.globalAlpha = rand() * 0.4 + 0.1
-        ctx.beginPath()
-        ctx.arc(rand() * W, rand() * H, rand() * 15 + 5, 0, Math.PI * 2)
-        ctx.fill()
-      }
-      ctx.globalAlpha = 1
-
-      ctx.fillStyle = '#e8456b'
-      ctx.textAlign = 'center'
-      ctx.font = 'bold 32px "Noto Serif SC", serif'
-      ctx.fillText('🎂 Happy Birthday! 🎂', W / 2, 200)
-      ctx.font = '24px "Noto Sans SC", sans-serif'
-      ctx.fillStyle = '#8a5a6a'
-      ctx.fillText(recipient, W / 2, 245)
-
-      ctx.fillStyle = '#4a3a4a'
-      wrapText(content, W / 2, 320, 520, contentLineHeight, contentFont + 'px "Noto Serif SC", serif')
-
-      ctx.textAlign = 'right'
-      ctx.fillStyle = '#8a7a8a'
-      ctx.font = '33px "Noto Sans SC", sans-serif'
-      ctx.fillText(sender, W - 80, H - 120)
-      ctx.fillStyle = '#aaa'
-      ctx.font = '24px "Noto Sans SC", sans-serif'
-      ctx.fillText(time, W - 80, H - 85)
-    } else if (templateIdx === 4) {
+    } else if (templateIdx === 1) {
       // 极简文艺
       ctx.fillStyle = '#f8f8f8'
       ctx.fillRect(0, 0, W, H)
 
-      // Thin top border
       ctx.fillStyle = '#333'
       ctx.fillRect(80, 160, W - 160, 1.5)
 
@@ -528,7 +416,6 @@ function DownloadModal({ message, initialIdx, wall, onClose }: {
       ctx.fillStyle = '#555'
       wrapText(content, W / 2, 300, 520, contentLineHeight, contentFont + 'px "Noto Serif SC", serif')
 
-      // Bottom border
       ctx.fillRect(80, H - 170, W - 160, 1.5)
 
       ctx.textAlign = 'right'
@@ -538,100 +425,89 @@ function DownloadModal({ message, initialIdx, wall, onClose }: {
       ctx.fillStyle = '#aaa'
       ctx.font = '24px "Noto Sans SC", sans-serif'
       ctx.fillText(time, W - 80, H - 85)
-    } else if (templateIdx === 5) {
-      // 丝带信笺
-      ctx.fillStyle = '#fef6f0'
+    } else if (templateIdx === 2) {
+      // 星空许愿
+      const grad = ctx.createLinearGradient(0, 0, W * 0.3, H)
+      grad.addColorStop(0, '#0f0c29')
+      grad.addColorStop(0.5, '#1a1a4e')
+      grad.addColorStop(1, '#24243e')
+      ctx.fillStyle = grad
       ctx.fillRect(0, 0, W, H)
 
-      // Ribbon
-      ctx.fillStyle = color + '40'
-      ctx.fillRect(0, 0, 60, H)
-      ctx.fillRect(W - 60, 0, 60, H)
+      const rng = (seed: number) => { let s = seed; return () => { s = (s * 9301 + 49297) % 233280; return s / 233280 } }
+      const rand = rng(42)
+      for (let i = 0; i < 80; i++) {
+        ctx.fillStyle = `rgba(255,255,255,${rand() * 0.6 + 0.2})`
+        ctx.beginPath()
+        ctx.arc(rand() * W, rand() * H, rand() * 2.5 + 0.3, 0, Math.PI * 2)
+        ctx.fill()
+      }
 
-      // Corner decoration
-      ctx.strokeStyle = color
-      ctx.lineWidth = 2
-      ctx.beginPath()
-      ctx.moveTo(80, 180)
-      ctx.lineTo(120, 180)
-      ctx.moveTo(80, 180)
-      ctx.lineTo(80, 220)
-      ctx.stroke()
-      ctx.beginPath()
-      ctx.moveTo(W - 80, 180)
-      ctx.lineTo(W - 120, 180)
-      ctx.moveTo(W - 80, 180)
-      ctx.lineTo(W - 80, 220)
-      ctx.stroke()
-
-      ctx.fillStyle = color
-      ctx.textAlign = 'center'
-      ctx.font = 'bold 26px "Noto Serif SC", serif'
-      ctx.fillText('致 ' + recipient, W / 2, 230)
-
-      ctx.fillStyle = '#4a3a2a'
-      wrapText(content, W / 2, 320, 480, contentLineHeight, contentFont + 'px "Noto Serif SC", serif')
-
-      ctx.textAlign = 'right'
-      ctx.fillStyle = '#8a7a6a'
-      ctx.font = '33px "Noto Sans SC", sans-serif'
-      ctx.fillText(sender, W - 100, H - 120)
-      ctx.fillStyle = '#a89a8a'
-      ctx.font = '24px "Noto Sans SC", sans-serif'
-      ctx.fillText(time, W - 100, H - 85)
-    } else if (templateIdx === 6) {
-      // 童趣可爱
-      ctx.fillStyle = '#f0f8ff'
+      const glow = ctx.createRadialGradient(W / 2, 200, 0, W / 2, 200, 300)
+      glow.addColorStop(0, color + '30')
+      glow.addColorStop(1, 'transparent')
+      ctx.fillStyle = glow
       ctx.fillRect(0, 0, W, H)
 
-      // Rainbow top bar
-      const rainbow = ['#ff6b6b', '#ffa500', '#ffd93d', '#6bcb77', '#4d96ff', '#c084fc']
-      const barH = 20
-      rainbow.forEach((c, i) => {
-        ctx.fillStyle = c
-        ctx.fillRect(0, 100 + i * barH, W, barH)
-      })
-
-      ctx.fillStyle = '#e8456b'
+      ctx.fillStyle = '#fff'
+      ctx.globalAlpha = 0.6
+      ctx.font = '13px "Noto Sans SC", sans-serif'
       ctx.textAlign = 'center'
+      ctx.fillText('✦  致  ✦', W / 2, 200)
+      ctx.globalAlpha = 1
       ctx.font = 'bold 30px "Noto Serif SC", serif'
-      ctx.fillText('🌈 ' + recipient + ' 🌈', W / 2, 290)
+      ctx.fillText(recipient, W / 2, 245)
 
-      ctx.fillStyle = '#4a3a5a'
-      wrapText(content, W / 2, 350, 520, contentLineHeight, contentFont + 'px "Noto Serif SC", serif')
+      ctx.fillStyle = 'rgba(255,255,255,0.88)'
+      wrapText(content, W / 2, 340, 520, contentLineHeight, contentFont + 'px "Noto Serif SC", serif')
 
       ctx.textAlign = 'right'
-      ctx.fillStyle = '#7a7a9a'
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'
       ctx.font = '33px "Noto Sans SC", sans-serif'
-      ctx.fillText('✨ ' + sender, W - 80, H - 120)
-      ctx.fillStyle = '#aaa'
+      ctx.fillText(sender, W - 80, H - 120)
+      ctx.fillStyle = 'rgba(255,255,255,0.35)'
       ctx.font = '24px "Noto Sans SC", sans-serif'
       ctx.fillText(time, W - 80, H - 85)
     } else {
-      // 复古生日
-      ctx.fillStyle = '#f5efe8'
+      // 月夜祝愿
+      ctx.fillStyle = '#f5f0e6'
       ctx.fillRect(0, 0, W, H)
 
-      // Stamp decoration
-      ctx.strokeStyle = color
-      ctx.lineWidth = 3
-      ctx.globalAlpha = 0.15
+      // Paper grain
+      ctx.fillStyle = '#e8e0d5'
+      for (let i = 0; i < 300; i++) {
+        ctx.fillRect(Math.random() * W, Math.random() * H, 1, 1)
+      }
+
+      // Crescent moon outline
+      ctx.strokeStyle = '#4a4a4a'
+      ctx.lineWidth = 1.5
       ctx.beginPath()
-      ctx.arc(W / 2, 180, 60, 0, Math.PI * 2)
+      ctx.arc(680, 130, 40, -Math.PI * 0.6, Math.PI * 0.6, false)
+      ctx.arc(660, 130, 32, Math.PI * 0.5, -Math.PI * 0.5, true)
+      ctx.closePath()
       ctx.stroke()
-      ctx.globalAlpha = 1
 
-      ctx.fillStyle = '#5a4a3a'
+      // Stars - 4-pointed hand-drawn style
+      const drawStar = (x: number, y: number, size: number) => {
+        ctx.strokeStyle = '#4a4a4a'; ctx.lineWidth = 1.5
+        ctx.beginPath()
+        ctx.moveTo(x, y - size); ctx.lineTo(x + size * 0.2, y - size * 0.2)
+        ctx.lineTo(x + size, y); ctx.lineTo(x + size * 0.2, y + size * 0.2)
+        ctx.lineTo(x, y + size); ctx.lineTo(x - size * 0.2, y + size * 0.2)
+        ctx.lineTo(x - size, y); ctx.lineTo(x - size * 0.2, y - size * 0.2)
+        ctx.closePath(); ctx.stroke(); ctx.fillStyle = '#f5f0e6'; ctx.fill()
+      }
+      drawStar(120, 100, 12); drawStar(280, 150, 8); drawStar(520, 80, 10)
+      drawStar(720, 280, 9); drawStar(150, 400, 7); drawStar(680, 450, 11)
+      drawStar(100, 650, 8); drawStar(750, 700, 10); drawStar(200, 850, 9)
+
+      ctx.fillStyle = '#6b5a4a'
       ctx.textAlign = 'center'
-      ctx.font = 'bold 28px "Noto Serif SC", serif'
-      ctx.fillText(recipient, W / 2, 188)
+      ctx.font = 'bold 26px "Noto Serif SC", serif'
+      ctx.fillText('致 ' + recipient, W / 2, 280)
 
-      ctx.fillStyle = '#6a5a4a'
-      ctx.font = '14px "Noto Sans SC", sans-serif'
-      ctx.fillText('— 谨以此卡，祝您快乐 —', W / 2, 230)
-
-      ctx.fillStyle = '#4a3a2a'
-      wrapText(content, W / 2, 310, 520, contentLineHeight, contentFont + 'px "Noto Serif SC", serif')
+      wrapText(content, W / 2, 340, 520, contentLineHeight, contentFont + 'px "Noto Serif SC", serif')
 
       ctx.textAlign = 'right'
       ctx.fillStyle = '#8a7a6a'
@@ -663,7 +539,7 @@ function DownloadModal({ message, initialIdx, wall, onClose }: {
         <div className="flex flex-col sm:flex-row gap-6">
           {/* Left: Template selector */}
           <div className="flex-1">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+            <div className="grid grid-cols-2 gap-3 mb-5">
               {TEMPLATES.map((tpl, idx) => (
                 <button
                   key={idx}
