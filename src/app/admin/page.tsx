@@ -166,7 +166,7 @@ export default function AdminPage() {
     }
   }
 
-  if (!token && !sessionStorage.getItem('admin_token')) {
+  if (!token && typeof window !== 'undefined' && !sessionStorage.getItem('admin_token')) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
